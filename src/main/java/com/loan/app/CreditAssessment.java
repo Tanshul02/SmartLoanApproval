@@ -23,7 +23,8 @@ public class CreditAssessment {
 
     public double calculateMaximumPermissibleLoan(Customer customer) {
 
-        double incomeBasedLimit = customer.getMonthlyIncome() * 20;
+        double incomeBasedLimit =
+                customer.getMonthlyIncome() * 20;
 
         double dtiBasedLimit =
                 (customer.getMonthlyIncome() * 0.50
@@ -45,62 +46,100 @@ public class CreditAssessment {
 
         List<String> rejectionReasons = new ArrayList<>();
 
+        // Check minimum age
         if (customer.getAge() < MINIMUM_AGE) {
-            rejectionReasons.add("Customer must be at least 21 years old");
+            rejectionReasons.add(
+                    "Customer must be at least 21 years old"
+            );
         }
 
+        // Check government identification
         if (customer.getGovernmentId() == null
                 || customer.getGovernmentId().trim().isEmpty()) {
-            rejectionReasons.add("Government identification number is invalid");
+
+            rejectionReasons.add(
+                    "Government identification number is invalid"
+            );
         }
 
+        // Check minimum income
         if (customer.getMonthlyIncome() < MINIMUM_INCOME) {
-            rejectionReasons.add("Monthly income is below the minimum threshold");
+            rejectionReasons.add(
+                    "Monthly income is below the minimum threshold"
+            );
         }
 
+        // Check minimum credit score
         if (customer.getCreditScore() < MINIMUM_CREDIT_SCORE) {
-            rejectionReasons.add("Credit score is below the minimum requirement");
+            rejectionReasons.add(
+                    "credit score is below the minimum requirement"
+            );
         }
 
+        // Calculate DTI
         double dti = calculateDTI(application);
 
+        // Check maximum DTI
         if (dti > MAXIMUM_DTI) {
-            rejectionReasons.add("Debt-to-income ratio exceeds 50%");
+            rejectionReasons.add(
+                    "Debt-to-income ratio exceeds 50%"
+            );
         }
 
-        double maximumLoan = calculateMaximumPermissibleLoan(customer);
+        // Calculate maximum permissible loan
+        double maximumLoan =
+                calculateMaximumPermissibleLoan(customer);
 
+        // Check requested loan amount
         if (application.getRequestedLoanAmount() > maximumLoan) {
-            rejectionReasons.add("Requested loan exceeds maximum permissible loan amount");
+            rejectionReasons.add(
+                    "Requested loan exceeds maximum permissible loan amount"
+            );
         }
 
+        // If there are any rejection reasons
         if (!rejectionReasons.isEmpty()) {
 
             StringBuilder result = new StringBuilder();
 
             if (dti > MAXIMUM_DTI
                     || application.getRequestedLoanAmount() > maximumLoan) {
+
                 result.append("HIGH RISK / REJECTED\n");
+
             } else {
+
                 result.append("REJECTED\n");
             }
 
             result.append("Reasons:\n");
 
             for (String reason : rejectionReasons) {
-                result.append("- ").append(reason).append("\n");
+                result.append("- ")
+                      .append(reason)
+                      .append("\n");
             }
 
-            result.append(String.format(
-                    "Maximum Permissible Loan: Rs. %.2f\n", maximumLoan));
+            result.append(
+                    String.format(
+                            "Maximum Permissible Loan: Rs. %.2f\n",
+                            maximumLoan
+                    )
+            );
 
-            result.append(String.format(
-                    "DTI: %.2f%%", dti));
+            result.append(
+                    String.format(
+                            "DTI: %.2f%%",
+                            dti
+                    )
+            );
 
             return result.toString();
         }
 
-        if (customer.getCreditScore() >= 750 && dti <= 30) {
+        // Low risk approval
+        if (customer.getCreditScore() >= 750
+                && dti <= 30) {
 
             return String.format(
                     "APPROVED - LOW RISK\n" +
@@ -109,9 +148,11 @@ public class CreditAssessment {
                     "DTI: %.2f%%",
                     customer.getName(),
                     maximumLoan,
-                    dti);
+                    dti
+            );
         }
 
+        // Medium risk approval
         return String.format(
                 "APPROVED - MEDIUM RISK\n" +
                 "Customer: %s\n" +
@@ -119,42 +160,55 @@ public class CreditAssessment {
                 "DTI: %.2f%%",
                 customer.getName(),
                 maximumLoan,
-                dti);
+                dti
+        );
     }
 
     private void validateInput(LoanApplication application)
             throws InvalidLoanDataException {
 
+        // Check application
         if (application == null) {
             throw new InvalidLoanDataException(
-                    "Loan application cannot be null");
+                    "Loan application cannot be null"
+            );
         }
 
+        // Check customer
         if (application.getCustomer() == null) {
             throw new InvalidLoanDataException(
-                    "Customer details cannot be null");
+                    "Customer details cannot be null"
+            );
         }
 
         Customer customer = application.getCustomer();
 
+        // Check income
         if (customer.getMonthlyIncome() < 0) {
             throw new InvalidLoanDataException(
-                    "Monthly income cannot be negative");
+                    "Monthly income cannot be negative"
+            );
         }
 
+        // Check existing obligations
         if (customer.getExistingMonthlyObligations() < 0) {
             throw new InvalidLoanDataException(
-                    "Existing loan obligations cannot be negative");
+                    "Existing loan obligations cannot be negative"
+            );
         }
 
+        // Check requested loan amount
         if (application.getRequestedLoanAmount() <= 0) {
             throw new InvalidLoanDataException(
-                    "Requested loan amount must be greater than zero");
+                    "Requested loan amount must be greater than zero"
+            );
         }
 
+        // Check proposed monthly payment
         if (application.getProposedMonthlyLoanPayment() < 0) {
             throw new InvalidLoanDataException(
-                    "Monthly loan payment cannot be negative");
+                    "Monthly loan payment cannot be negative"
+            );
         }
     }
 }
